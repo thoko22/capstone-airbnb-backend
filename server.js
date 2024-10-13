@@ -25,6 +25,11 @@ app.use(express.urlencoded({ extended: true }));
 // Serve static files from the uploads directory
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+// Define root route
+app.get('/', (req, res) => {
+  res.send('Welcome to the Home Page!');
+});
+
 app.use("/api/users", userRoutes);
 app.use("/api/accommodations", accommodationRoutes);
 app.use("/api/reservations", reservationRoutes);
@@ -44,4 +49,3 @@ mongoose.connect(process.env.MONGO_URI, {
   .catch((err) => {
     console.error('MongoDB connection error:', err);
   }); 
-
