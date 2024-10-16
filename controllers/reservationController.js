@@ -9,10 +9,9 @@ const createReservation = async (req, res) => {
       checkIn, 
       checkOut, 
       guests, 
-      totalPrice // Accept totalPrice directly from the request body
+      totalPrice 
     } = req.body;
 
-    // Validate that required fields are present
     if (!accommodationId || !checkIn || !checkOut || !guests || !totalPrice) {
       return res.status(400).json({ message: "All fields are required." });
     }
@@ -41,7 +40,7 @@ const createReservation = async (req, res) => {
     const savedReservation = await reservation.save();
     res.status(201).json(savedReservation);
   } catch (error) {
-    console.error("Error creating reservation:", error); // Log the error details
+    console.error("Error creating reservation:", error);
     res.status(400).json({ message: "Reservation creation failed", error: error.message });
   }
 };
@@ -71,7 +70,7 @@ const getReservationsByUser = async (req, res) => {
   try {
     const reservations = await Reservation.find({ user: req.user._id })
       .populate("accommodation", "title") // Populate only the title field
-      .populate("user", "name"); // Optional: If you have a user field in Reservation
+      .populate("user", "name");
 
     if (reservations.length === 0) {
       return res.status(404).json({ message: "No reservations found for the user" });
@@ -80,6 +79,22 @@ const getReservationsByUser = async (req, res) => {
     res.status(200).json(reservations);
   } catch (error) {
     res.status(400).json({ message: "Failed to fetch reservations by user", error });
+  }
+};
+
+const getAllReservations = async (req, res) => {
+  try {
+    const reservations = await Reservation.find()
+      .populate("accommodation", "title host") // Populate accommodation details
+      .populate("user", "name email"); // Populate user details
+
+    if (reservations.length === 0) {
+      return res.status(404).json({ message: "No reservations found" });
+    }
+
+    res.status(200).json(reservations);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch all reservations", error });
   }
 };
 
@@ -96,4 +111,4 @@ const deleteReservation = async (req, res) => {
   }
 };
 
-module.exports = { createReservation, getReservationsByHost, getReservationsByUser, deleteReservation };
+module.exports = { createReservation, getReservationsByHost, getReservationsByUser, getAllReservations, deleteReservation };
